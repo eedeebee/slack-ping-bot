@@ -1,0 +1,31 @@
+{
+  "name": "slack-ping-bot",
+  "version": "0.0.1",
+  "description": "A bot which checks pingboard for active statuses for @mentions in slack messages and replies to the original user with the mentioned users active status if they have one",
+  "main": "slack_ping_bot.js",
+  "dependencies": {
+    "body-parser": "^1.14.2",
+    "botkit": "^0.1.1",
+    "express": "^4.13.3",
+    "moment-timezone": "^0.5.4",
+    "node-yaml-config": "0.0.4",
+    "request": "^2.67.0",
+    "simple-oauth2": "^0.7.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/colings86/slack-ping-bot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/colings86/slack-ping-bot/issues"
+  },
+  "homepage": "",
+  "keywords": [
+    "bots",
+    "chatbots",
+    "slack",
+    "pingboard"
+  ],
+  "author": "colings86.dev@gmail.com",
+  "license": "Apache-2.0"
+}

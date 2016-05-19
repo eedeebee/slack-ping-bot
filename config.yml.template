@@ -1,0 +1,12 @@
+default:
+    pingboardConfig:
+        clientID: '<CLIENT_ID>'
+        clientSecret: '<CLIENT_SECRET>'
+        excluded_status_types: []
+
+    slackBotConfig:
+        token: '<BOT_TOKEN>'
+
+    slackSlashConfig:
+        token: '<SLASH_TOKEN>'
+        command: '/pingboard'
