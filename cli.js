@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-require('./startTheBot');
+require('./slack_ping_bot.js');
