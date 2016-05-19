@@ -3,3 +3,4 @@
 .jscsrc
 config.yml
 CONTRIBUTING.md
+npm-debug.log
