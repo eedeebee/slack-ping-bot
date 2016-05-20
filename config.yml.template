@@ -10,3 +10,4 @@ default:
     slackSlashConfig:
         token: '<SLASH_TOKEN>'
         command: '/pingboard'
+        port: 3000

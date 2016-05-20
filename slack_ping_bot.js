@@ -161,7 +161,9 @@ var replyonResponse = function(status, authorUserId, mentionedUserId, mentionedN
     }
 };
 
-bot.botkit.setupWebserver(3000);
+var port = config.slackSlashConfig.port || 3000;
+
+bot.botkit.setupWebserver(port);
 
 bot.botkit.webserver.post('/slash', function(req, res) {
     if (req.body) {
