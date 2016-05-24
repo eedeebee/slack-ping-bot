@@ -25,7 +25,7 @@ var formData = {
     "user_id":"U176N0NUW",
     "user_name":"Steve",
     "command":"/pingboard",
-    "text":"U176N0NUW",
+    "text":"@test_user",
     "response_url":"https://hooks.slack.com/commands/1234/5678"
 };
 

@@ -159,8 +159,43 @@ var replyonResponse = function(status, authorUserId, mentionedUserId, mentionedN
     var statusMessage = getStatusReplyText(status, authorUserId, mentionedName, startDate, endDate);
     if (statusMessage) {
         responseContext.res.send(statusMessage);
+    } else {
+        responseContext.res.send('<@' + authorUserId + '>: ' + mentionedName + ' does not have an active status');
     }
 };
+
+var userInfosByNameCache = {};
+var userInfosByIdCache = {};
+
+var cacheUsersList = function() {
+    bot.botkit.log('Reloading User Info Caches');
+    webAPI.users.list({}, function(error, response) {
+        if (response.ok) {
+            userInfosByName = {};
+            userInfosById = {};
+            response.members.forEach(function(userInfo) {
+                var condensedUserInfo = {
+                    id: userInfo.id,
+                    name: userInfo.name,
+                    first_name: userInfo.profile.first_name,
+                    last_name: userInfo.profile.last_name,
+                    real_name: userInfo.profile.real_name,
+                    tz: userInfo.tz
+                };
+                userInfosByName[userInfo.name] = condensedUserInfo;
+                userInfosById[userInfo.id] = condensedUserInfo;
+            });
+            userInfosByNameCache = userInfosByName;
+            userInfosByIdCache = userInfosById;
+            bot.botkit.log('User Info Caches reload complete');
+        } else {
+            bot.botkit.log('Error getting user list: ', error);
+        }
+    });
+};
+
+cacheUsersList();
+setInterval(cacheUsersList, config.userCacheRefreshInterval);
 
 var port = config.slackSlashConfig.port || 3000;
 
@@ -173,13 +208,17 @@ bot.botkit.webserver.post('/slash', function(req, res) {
             var command = req.body.command;
             if (command == slackSlashConfig.command) {
                 var user = req.body.user_id;
-                var text = req.body.text;
-                var replyContext = {
-                    'user': user,
-                    'res': res
-                };
-
-                replyWithPingboardStatus(text, replyonResponse, replyContext);
+                var text = req.body.text.replace('@', '');
+                var textUserInfo = userInfosByNameCache[text];
+                if (textUserInfo) {
+                    var replyContext = {
+                        'user': user,
+                        'res': res
+                    };
+                    replyWithPingboardStatus(textUserInfo.id, replyonResponse, replyContext);
+                } else {
+                    res.send('Could not find user: ' + text);
+                }
             } else {
                 bot.botkit.log('received request with invalid command: ' + command);
             }
