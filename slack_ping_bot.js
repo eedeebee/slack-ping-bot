@@ -171,10 +171,10 @@ var replyonResponse = function(status, authorUserId, mentionedUserId, mentionedN
         if (statusMessage) {
             responseContext.res.send(statusMessage);
         } else {
-            responseContext.res.send('<@' + authorUserId + '>: ' + mentionedName + ' does not have an active status');
-        } 
+            responseContext.res.send('<@' + authorUserId + '>: ' + mentionedName + ' has no active status on pingboard, so they should be available');
+        }
     }else {
-        responseContext.res.send('<@' + authorUserId + '>: ' + mentionedName + ' does not have an active status');
+        responseContext.res.send('<@' + authorUserId + '>: ' + mentionedName + ' has no active status on pingboard, so they should be available');
     }
 };
 
