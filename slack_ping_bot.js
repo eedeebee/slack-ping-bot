@@ -89,34 +89,40 @@ var replyWithPingboardStatus = function(mentioned_user_id, reply_function, reply
                     var users = json.users;
                     if (users.length == 1) {
                         var userId = users[0].id;
+                        var now = Date.now();
                         getstatusOptions = {
                             params: {
-                                'user_id': userId
+                                'user_id': userId,
+                                'starts_at': new Date(now),
+                                'ends_at': new Date(now)
                             }
                         };
                         pingboardAPI.status.getStatuses(getstatusOptions, function(error, json) {
-                            var statuses = json.statuses;
-                            if (statuses.length > 0) {
-                                var now = Date.now();
-                                statuses.forEach(function(status) {
-                                    var startDate = Date.parse(status.starts_at);
-                                    var endDate = Date.parse(status.ends_at);
-                                    bot.botkit.debug(status.message + ' - starts: ' + startDate + ', ends: ' + endDate + ', now: ' + now);
-                                    if (now >= startDate && now <= endDate) {
-                                        bot.botkit.log(status.message + ' - matched');
-                                        webAPI.users.info({
-                                            user: reply_context.user
-                                        }, function(error, authorInfo) {
-                                            if (authorInfo.ok && !authorInfo.user.is_bot) {
-                                                var startDateInTZ = moment.tz(startDate, authorInfo.user.tz).format(dateFormat);
-                                                var endDateInTZ = moment.tz(endDate, authorInfo.user.tz).format(dateFormat);
-                                                reply_function(status, reply_context.user, userInfo.user.id, userInfo.user.real_name, startDateInTZ, endDateInTZ, now, reply_context);
-                                            } else if (!userInfo.ok) {
-                                                bot.botkit.log('Error getting author user info: [' + reply_context.user + ']: ', error);
-                                            }
-                                        });
-                                    }
-                                });
+                            if (!error) {
+                                var statuses = json.statuses;
+                                if (statuses.length > 0) {
+                                    statuses.forEach(function(status) {
+                                        var startDate = Date.parse(status.starts_at);
+                                        var endDate = Date.parse(status.ends_at);
+                                        bot.botkit.debug(status.message + ' - starts: ' + startDate + ', ends: ' + endDate + ', now: ' + now);
+                                        if (now >= startDate && now <= endDate) {
+                                            bot.botkit.log(status.message + ' - matched');
+                                            webAPI.users.info({
+                                                user: reply_context.user
+                                            }, function(error, authorInfo) {
+                                                if (authorInfo.ok && !authorInfo.user.is_bot) {
+                                                    var startDateInTZ = moment.tz(startDate, authorInfo.user.tz).format(dateFormat);
+                                                    var endDateInTZ = moment.tz(endDate, authorInfo.user.tz).format(dateFormat);
+                                                    reply_function(status, reply_context.user, userInfo.user.id, userInfo.user.real_name, startDateInTZ, endDateInTZ, now, reply_context);
+                                                } else if (!userInfo.ok) {
+                                                    bot.botkit.log('Error getting author user info: [' + reply_context.user + ']: ', error);
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            } else {
+                                bot.botkit.log('Error getting statuses from pingboard. Options : [' + JSON.stringify(getstatusOptions) + ']: ', error);
                             }
                         });
                     } else {

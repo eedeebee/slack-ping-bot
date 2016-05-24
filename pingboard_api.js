@@ -80,7 +80,7 @@ module.exports = function(bot, config, bootstrapCallback) {
                         pingboard_api.callAPI(command, options, cb);
                     });
                 } else {
-                    if (cb) cb(error || 'Invalid response');
+                    if (cb) cb(error || ('Invalid response. Status code: ' + (response.statusCode || "unknown")));
                 }
             });
         },
