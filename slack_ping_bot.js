@@ -120,6 +120,8 @@ var replyWithPingboardStatus = function(mentioned_user_id, reply_function, reply
                                             });
                                         }
                                     });
+                                } else {
+                                    reply_function(null, reply_context.user, userInfo.user.id, userInfo.user.real_name, null, null, now, reply_context);
                                 }
                             } else {
                                 bot.botkit.log('Error getting statuses from pingboard. Options : [' + JSON.stringify(getstatusOptions) + ']: ', error);
@@ -149,23 +151,29 @@ var getStatusReplyText = function(status, authorUserId, mentionedName, startDate
 };
 
 var replyWithSlackMessage = function(status, authorUserId, mentionedUserId, mentionedName, startDate, endDate, now, message) {
-    var statusMessage = getStatusReplyText(status, authorUserId, mentionedName, startDate, endDate);
-    if (statusMessage) {
-        if (!cache[authorUserId]) {
-            cache[authorUserId] = {};
-        }
-        if (!cache[authorUserId][mentionedUserId] || ((now - cache[authorUserId][mentionedUserId]) >= messageDelay)) {
-            bot.reply(message, statusMessage);
-            cache[authorUserId][mentionedUserId] = now;
+    if (status) {
+        var statusMessage = getStatusReplyText(status, authorUserId, mentionedName, startDate, endDate);
+        if (statusMessage) {
+            if (!cache[authorUserId]) {
+                cache[authorUserId] = {};
+            }
+            if (!cache[authorUserId][mentionedUserId] || ((now - cache[authorUserId][mentionedUserId]) >= messageDelay)) {
+                bot.reply(message, statusMessage);
+                cache[authorUserId][mentionedUserId] = now;
+            }
         }
     }
 };
 
 var replyonResponse = function(status, authorUserId, mentionedUserId, mentionedName, startDate, endDate, now, responseContext) {
-    var statusMessage = getStatusReplyText(status, authorUserId, mentionedName, startDate, endDate);
-    if (statusMessage) {
-        responseContext.res.send(statusMessage);
-    } else {
+    if (status) {
+        var statusMessage = getStatusReplyText(status, authorUserId, mentionedName, startDate, endDate);
+        if (statusMessage) {
+            responseContext.res.send(statusMessage);
+        } else {
+            responseContext.res.send('<@' + authorUserId + '>: ' + mentionedName + ' does not have an active status');
+        } 
+    }else {
         responseContext.res.send('<@' + authorUserId + '>: ' + mentionedName + ' does not have an active status');
     }
 };
