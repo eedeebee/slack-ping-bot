@@ -73,9 +73,10 @@ var dateFormat = "ddd YYYY-MM-DD HH:mm:ss z (Z)";
 
 // Call to Pingboard and get current status for user
 var replyWithPingboardStatus = function(mentioned_user_id, reply_function, reply_context) {
+    bot.botkit.log('mentioned_user_id', mentioned_user_id);
     webAPI.users.info({
         user: mentioned_user_id
-    }, function(unused, userInfo) {
+    }, function(error, userInfo) {
         if (userInfo.ok && !userInfo.user.is_bot) {
             var searchUsersOptions = {
                 params: {
@@ -105,13 +106,13 @@ var replyWithPingboardStatus = function(mentioned_user_id, reply_function, reply
                                         bot.botkit.log(status.message + ' - matched');
                                         webAPI.users.info({
                                             user: reply_context.user
-                                        }, function(unused, authorInfo) {
+                                        }, function(error, authorInfo) {
                                             if (authorInfo.ok && !authorInfo.user.is_bot) {
                                                 var startDateInTZ = moment.tz(startDate, authorInfo.user.tz).format(dateFormat);
                                                 var endDateInTZ = moment.tz(endDate, authorInfo.user.tz).format(dateFormat);
                                                 reply_function(status, reply_context.user, userInfo.user.id, userInfo.user.real_name, startDateInTZ, endDateInTZ, now, reply_context);
                                             } else if (!userInfo.ok) {
-                                                bot.botkit.log('Error getting author user info: ' + reply_context.user + ': ', error);
+                                                bot.botkit.log('Error getting author user info: [' + reply_context.user + ']: ', error);
                                             }
                                         });
                                     }
@@ -126,7 +127,7 @@ var replyWithPingboardStatus = function(mentioned_user_id, reply_function, reply
                 }
             });
         } else if (!userInfo.ok) {
-            bot.botkit.log('Error getting mentioned user info: ' + reply_context.user + ': ', unused);
+            bot.botkit.log('Error getting mentioned user info: [' + mentioned_user_id + ']: ', error);
         }
     });
 };
@@ -177,6 +178,7 @@ bot.botkit.webserver.post('/slash', function(req, res) {
                     'user': user,
                     'res': res
                 };
+
                 replyWithPingboardStatus(text, replyonResponse, replyContext);
             } else {
                 bot.botkit.log('received request with invalid command: ' + command);
