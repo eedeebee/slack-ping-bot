@@ -126,7 +126,7 @@ var replyWithPingboardStatus = function(mentioned_user_id, reply_function, reply
                 }
             });
         } else if (!userInfo.ok) {
-            bot.botkit.log('Error getting mentioned user info: ' + reply_context.user + ': ', error);
+            bot.botkit.log('Error getting mentioned user info: ' + reply_context.user + ': ', unused);
         }
     });
 };
