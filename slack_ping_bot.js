@@ -84,7 +84,7 @@ var replyWithPingboardStatus = function(mentioned_user_id, reply_function, reply
                     'last_name': userInfo.user.profile.last_name
                 }
             };
-            var logPrintableName = (first_name || 'null') + ' ' + (last_name || 'null') + ' (' + mentioned_user_id + ')';
+            var logPrintableName = (searchUsersOptions.params.first_name || 'null') + ' ' + (searchUsersOptions.params.last_name || 'null') + ' (' + mentioned_user_id + ')';
             pingboardAPI.users.searchUsers(searchUsersOptions, function(error, json) {
                 if (!error) {
                     var users = json.users;
