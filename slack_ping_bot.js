@@ -84,6 +84,7 @@ var replyWithPingboardStatus = function(mentioned_user_id, reply_function, reply
                     'last_name': userInfo.user.profile.last_name
                 }
             };
+            var logPrintableName = (first_name || 'null') + ' ' + (last_name || 'null') + ' (' + mentioned_user_id + ')';
             pingboardAPI.users.searchUsers(searchUsersOptions, function(error, json) {
                 if (!error) {
                     var users = json.users;
@@ -128,10 +129,10 @@ var replyWithPingboardStatus = function(mentioned_user_id, reply_function, reply
                             }
                         });
                     } else {
-                        bot.botkit.log('Got ' + users.length + ' results from pingboard user search. Cannot resolve user ' + first_name + ' ' + last_name, error);
+                        bot.botkit.log('Got ' + users.length + ' results from pingboard user search. Cannot resolve user ' + logPrintableName, error);
                     }
                 } else {
-                    bot.botkit.log('Request failed. Could not get pingboard status for ' + first_name + last_name, error);
+                    bot.botkit.log('Request failed. Could not get pingboard status for ' + logPrintableName, error);
                 }
             });
         } else if (!userInfo.ok) {
