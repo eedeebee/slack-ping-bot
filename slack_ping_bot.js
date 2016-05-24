@@ -105,10 +105,10 @@ var replyWithPingboardStatus = function(mentioned_user_id, reply_function, reply
                                         bot.botkit.log(status.message + ' - matched');
                                         webAPI.users.info({
                                             user: reply_context.user
-                                        }, function(unused, userInfo) {
-                                            if (userInfo.ok && !userInfo.user.is_bot) {
-                                                var startDateInTZ = moment.tz(startDate, userInfo.user.tz).format(dateFormat);
-                                                var endDateInTZ = moment.tz(endDate, userInfo.user.tz).format(dateFormat);
+                                        }, function(unused, authorInfo) {
+                                            if (authorInfo.ok && !authorInfo.user.is_bot) {
+                                                var startDateInTZ = moment.tz(startDate, authorInfo.user.tz).format(dateFormat);
+                                                var endDateInTZ = moment.tz(endDate, authorInfo.user.tz).format(dateFormat);
                                                 reply_function(status, reply_context.user, userInfo.user.id, userInfo.user.real_name, startDateInTZ, endDateInTZ, now, reply_context);
                                             } else if (!userInfo.ok) {
                                                 bot.botkit.log('Error getting author user info: ' + reply_context.user + ': ', error);
