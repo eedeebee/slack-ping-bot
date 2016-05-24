@@ -55,11 +55,7 @@ var loadStatusTypes = function() {
     pingboardAPI.status.getStatusTypes({}, function(error, json) {
         if (!error) {
             json.status_types.forEach(function(status_type) {
-                if (pingboardConfig.excluded_status_types.indexOf(status_type.slug) > -1) {
-                    bot.botkit.log('Skipping excluded status_type: ', JSON.stringify(status_type));
-                } else {
-                    statusTypes[status_type.id] = status_type.name;
-                }
+                statusTypes[status_type.id] = status_type;
             });
         } else {
             bot.botkit.log('Request failed. Could not get pingboard status types', error);
@@ -145,7 +141,7 @@ var getStatusReplyText = function(status, authorUserId, mentionedName, startDate
     var statusType = statusTypes[status.status_type_id];
     if (statusType) {
         var statusMessage = status.message;
-        return '<@' + authorUserId + '>: ' + mentionedName + ' is currently ' + statusType + ' - ' + statusMessage +
+        return '<@' + authorUserId + '>: ' + mentionedName + ' is currently ' + statusType.name + ' - ' + statusMessage +
             ' [' + startDate + ' TO ' + endDate + ']' + ' in pingboard and may not reply.';
     }
     return;
@@ -153,14 +149,17 @@ var getStatusReplyText = function(status, authorUserId, mentionedName, startDate
 
 var replyWithSlackMessage = function(status, authorUserId, mentionedUserId, mentionedName, startDate, endDate, now, message) {
     if (status) {
-        var statusMessage = getStatusReplyText(status, authorUserId, mentionedName, startDate, endDate);
-        if (statusMessage) {
-            if (!cache[authorUserId]) {
-                cache[authorUserId] = {};
-            }
-            if (!cache[authorUserId][mentionedUserId] || ((now - cache[authorUserId][mentionedUserId]) >= messageDelay)) {
-                bot.reply(message, statusMessage);
-                cache[authorUserId][mentionedUserId] = now;
+        var statusType = statusTypes[status.status_type_id];
+        if (pingboardConfig.excluded_status_types.indexOf(statusType.slug) === -1) {
+            var statusMessage = getStatusReplyText(status, authorUserId, mentionedName, startDate, endDate);
+            if (statusMessage) {
+                if (!cache[authorUserId]) {
+                    cache[authorUserId] = {};
+                }
+                if (!cache[authorUserId][mentionedUserId] || ((now - cache[authorUserId][mentionedUserId]) >= messageDelay)) {
+                    bot.reply(message, statusMessage);
+                    cache[authorUserId][mentionedUserId] = now;
+                }
             }
         }
     }
