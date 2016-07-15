@@ -119,7 +119,12 @@ var replyWithPingboardStatus = function(mentioned_user_id, reply_function, reply
                                         }
                                     });
                                 } else {
-                                    reply_function(null, reply_context.user, userInfo.user.id, userInfo.user.real_name, null, null, now, reply_context);
+                                    webAPI.users.info({
+                                        user: reply_context.user
+                                    }, function(error, authorInfo) {
+                                        var nowDateInTZ = moment.tz(now, authorInfo.user.tz).format(dateFormat);
+                                        reply_function(null, reply_context.user, userInfo.user.id, userInfo.user.real_name, null, null, nowDateInTZ, now, reply_context);
+                                    });
                                 }
                             } else {
                                 bot.botkit.log('Error getting statuses from pingboard. Options : [' + JSON.stringify(getstatusOptions) + ']: ', error);
@@ -174,11 +179,17 @@ var replyonResponse = function(status, authorUserId, mentionedUserId, mentionedN
             responseContext.res.send(statusMessage);
         } else {
             var replyString = '<@' + authorUserId + '>: ' + mentionedName + ' has no active status on pingboard, so they should be available';
-            if (nowDate) replyString += mentionedName + '\'s current local time is ' + nowDate;
+            if (nowDate) {
+                replyString += '\n' + mentionedName + '\'s current local time is ' + nowDate;
+            }
             responseContext.res.send(replyString);
         }
     }else {
-        responseContext.res.send('<@' + authorUserId + '>: ' + mentionedName + ' has no active status on pingboard, so they should be available');
+        var replyString = '<@' + authorUserId + '>: ' + mentionedName + ' has no active status on pingboard, so they should be available';
+        if (nowDate) {
+            replyString += '\n' + mentionedName + '\'s current local time is ' + nowDate;
+        }
+        responseContext.res.send(replyString);
     }
 };
 

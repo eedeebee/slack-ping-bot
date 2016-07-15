@@ -17,7 +17,7 @@
 var request = require('request');
 
 var formData = {
-    "token":"<ADD TOKEN HERE>",
+    "token":"jT8jUz2qihCC9YIFQjeUeBKL",
     "team_id":"T0001",
     "team_domain":"example",
     "channel_id":"C2147483705",
@@ -25,7 +25,7 @@ var formData = {
     "user_id":"U176N0NUW",
     "user_name":"Steve",
     "command":"/pingboard",
-    "text":"@test_user",
+    "text":"@colings86",
     "response_url":"https://hooks.slack.com/commands/1234/5678"
 };
 
