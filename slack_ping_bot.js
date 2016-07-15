@@ -110,7 +110,8 @@ var replyWithPingboardStatus = function(mentioned_user_id, reply_function, reply
                                                 if (authorInfo.ok && !authorInfo.user.is_bot) {
                                                     var startDateInTZ = moment.tz(startDate, authorInfo.user.tz).format(dateFormat);
                                                     var endDateInTZ = moment.tz(endDate, authorInfo.user.tz).format(dateFormat);
-                                                    reply_function(status, reply_context.user, userInfo.user.id, userInfo.user.real_name, startDateInTZ, endDateInTZ, now, reply_context);
+                                                    var nowDateInTZ = moment.tz(endDate, authorInfo.user.tz).format(dateFormat);
+                                                    reply_function(status, reply_context.user, userInfo.user.id, userInfo.user.real_name, startDateInTZ, endDateInTZ, nowDateInTZ, now, reply_context);
                                                 } else if (!userInfo.ok) {
                                                     bot.botkit.log('Error getting author user info: [' + reply_context.user + ']: ', error);
                                                 }
@@ -137,21 +138,22 @@ var replyWithPingboardStatus = function(mentioned_user_id, reply_function, reply
     });
 };
 
-var getStatusReplyText = function(status, authorUserId, mentionedName, startDate, endDate) {
+var getStatusReplyText = function(status, authorUserId, mentionedName, startDate, endDate, nowDate) {
     var statusType = statusTypes[status.status_type_id];
     if (statusType) {
         var statusMessage = status.message;
-        return '<@' + authorUserId + '>: ' + mentionedName + ' is currently ' + statusType.name + ' - ' + statusMessage +
-            ' [' + startDate + ' TO ' + endDate + ']' + ' in pingboard and may not reply.';
+        var replyString = '<@' + authorUserId + '>: ' + mentionedName + ' is currently ' + statusType.name + ' - ' + statusMessage + ' [' + startDate + ' TO ' + endDate + ']' + ' in pingboard and may not reply.\n';
+        if (nowDate) replyString += mentionedName + '\'s current local time is ' + nowDate;
+        return replyString;
     }
     return;
 };
 
-var replyWithSlackMessage = function(status, authorUserId, mentionedUserId, mentionedName, startDate, endDate, now, message) {
+var replyWithSlackMessage = function(status, authorUserId, mentionedUserId, mentionedName, startDate, endDate, nowDate, now, message) {
     if (status) {
         var statusType = statusTypes[status.status_type_id];
         if (pingboardConfig.excluded_status_types.indexOf(statusType.slug) === -1) {
-            var statusMessage = getStatusReplyText(status, authorUserId, mentionedName, startDate, endDate);
+            var statusMessage = getStatusReplyText(status, authorUserId, mentionedName, startDate, endDate, null);
             if (statusMessage) {
                 if (!cache[authorUserId]) {
                     cache[authorUserId] = {};
@@ -165,9 +167,9 @@ var replyWithSlackMessage = function(status, authorUserId, mentionedUserId, ment
     }
 };
 
-var replyonResponse = function(status, authorUserId, mentionedUserId, mentionedName, startDate, endDate, now, responseContext) {
+var replyonResponse = function(status, authorUserId, mentionedUserId, mentionedName, startDate, endDate, nowDate, now, responseContext) {
     if (status) {
-        var statusMessage = getStatusReplyText(status, authorUserId, mentionedName, startDate, endDate);
+        var statusMessage = getStatusReplyText(status, authorUserId, mentionedName, startDate, endDate, nowDate);
         if (statusMessage) {
             responseContext.res.send(statusMessage);
         } else {
