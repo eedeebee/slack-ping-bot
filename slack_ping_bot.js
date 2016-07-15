@@ -110,7 +110,7 @@ var replyWithPingboardStatus = function(mentioned_user_id, reply_function, reply
                                                 if (authorInfo.ok && !authorInfo.user.is_bot) {
                                                     var startDateInTZ = moment.tz(startDate, authorInfo.user.tz).format(dateFormat);
                                                     var endDateInTZ = moment.tz(endDate, authorInfo.user.tz).format(dateFormat);
-                                                    var nowDateInTZ = moment.tz(now, authorInfo.user.tz).format(dateFormat);
+                                                    var nowDateInTZ = moment.tz(now, userInfo.user.tz).format(dateFormat);
                                                     reply_function(status, reply_context.user, userInfo.user.id, userInfo.user.real_name, startDateInTZ, endDateInTZ, nowDateInTZ, now, reply_context);
                                                 } else if (!userInfo.ok) {
                                                     bot.botkit.log('Error getting author user info: [' + reply_context.user + ']: ', error);
@@ -122,7 +122,7 @@ var replyWithPingboardStatus = function(mentioned_user_id, reply_function, reply
                                     webAPI.users.info({
                                         user: reply_context.user
                                     }, function(error, authorInfo) {
-                                        var nowDateInTZ = moment.tz(now, authorInfo.user.tz).format(dateFormat);
+                                        var nowDateInTZ = moment.tz(now, userInfo.user.tz).format(dateFormat);
                                         reply_function(null, reply_context.user, userInfo.user.id, userInfo.user.real_name, null, null, nowDateInTZ, now, reply_context);
                                     });
                                 }
