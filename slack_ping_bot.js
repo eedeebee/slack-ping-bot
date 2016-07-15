@@ -110,7 +110,7 @@ var replyWithPingboardStatus = function(mentioned_user_id, reply_function, reply
                                                 if (authorInfo.ok && !authorInfo.user.is_bot) {
                                                     var startDateInTZ = moment.tz(startDate, authorInfo.user.tz).format(dateFormat);
                                                     var endDateInTZ = moment.tz(endDate, authorInfo.user.tz).format(dateFormat);
-                                                    var nowDateInTZ = moment.tz(endDate, authorInfo.user.tz).format(dateFormat);
+                                                    var nowDateInTZ = moment.tz(now, authorInfo.user.tz).format(dateFormat);
                                                     reply_function(status, reply_context.user, userInfo.user.id, userInfo.user.real_name, startDateInTZ, endDateInTZ, nowDateInTZ, now, reply_context);
                                                 } else if (!userInfo.ok) {
                                                     bot.botkit.log('Error getting author user info: [' + reply_context.user + ']: ', error);
@@ -173,7 +173,9 @@ var replyonResponse = function(status, authorUserId, mentionedUserId, mentionedN
         if (statusMessage) {
             responseContext.res.send(statusMessage);
         } else {
-            responseContext.res.send('<@' + authorUserId + '>: ' + mentionedName + ' has no active status on pingboard, so they should be available');
+            var replyString = '<@' + authorUserId + '>: ' + mentionedName + ' has no active status on pingboard, so they should be available';
+            if (nowDate) replyString += mentionedName + '\'s current local time is ' + nowDate;
+            responseContext.res.send(replyString);
         }
     }else {
         responseContext.res.send('<@' + authorUserId + '>: ' + mentionedName + ' has no active status on pingboard, so they should be available');
